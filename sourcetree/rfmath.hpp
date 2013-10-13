@@ -10,7 +10,8 @@ namespace rf {
 	{
 		using namespace std;
 		if (b == 0) return make_tuple(a, 1, 0);
-		auto t = extended_euclidean(b,a%b);
+		auto t = extended_euclidean(b,
+				static_cast<T>(a%b));
 		return make_tuple(get<0>(t),
 					get<2>(t),
 				get<1>(t) - (a/b)*get<2>(t));
@@ -27,6 +28,9 @@ namespace rf {
 		}
 		return true;
 	}
+
+	void find_2_prime_factors_naive(const mpz_class& N,
+				mpz_class& x, mpz_class& y);
 } // end namespace rf
 
 #endif //RF_RFMATH_HPP

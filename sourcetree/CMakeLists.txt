@@ -13,6 +13,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 
 set(SRCS
 	main.cpp
+		rfmath.cpp
 	)
 
 add_executable(rsafun ${SRCS})
