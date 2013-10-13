@@ -1,14 +1,15 @@
 #include <iostream>
-#include "gmp.h"
+#include <tuple>
+#include "rfmath.hpp"
+#include "rfutils.hpp"
 
 int main(void) {
 	using namespace std;
-	mpz_t sum;
-	mpz_init(sum);
-	mpz_set_str(sum, "12345", 10);
-	cout << sum << endl;
-	mpz_clear(sum);
+
 	int i{};
-	cout << i << endl;
+	auto t = rf::extended_euclides(120,23);
+
+	cout << t << endl;
+
 	return 0;
 }
