@@ -11,17 +11,17 @@ namespace rf {
 	 * Usage is simple: std::cout << std::tuple;
 	 * */
 	template<int N>
-	struct print_tuple {
+	struct __print_tuple {
 		template<typename S,typename T>
 		static void print(S& o,const T& t)
 		{
-			print_tuple<N-1>::print(o,t);
+			__print_tuple<N-1>::print(o,t);
 			o << "," << std::get<N-1>(t);
 		}
 	};
 
 	template<>
-	struct print_tuple<1> {
+	struct __print_tuple<1> {
 		template<typename S,typename T>
 		static void print(S& o, const T& t)
 		{
@@ -35,7 +35,7 @@ std::basic_ostream<C,T>& operator<<(std::basic_ostream<C,T>& o,
 		const std::tuple<Args...>& t)
 {
 	o << "(";
-	rf::print_tuple<
+	rf::__print_tuple<
 		sizeof...(Args)
 		>::print(o,t);
 	return o << ")";
