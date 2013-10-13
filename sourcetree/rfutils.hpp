@@ -1,3 +1,6 @@
+#ifndef RF_RFUTILS_HPP
+#define RF_RFUTILS_HPP
+
 #include <tuple>
 #include <ostream>
 
@@ -41,3 +44,4 @@ std::basic_ostream<C,T>& operator<<(std::basic_ostream<C,T>& o,
 	return o << ")";
 }
 
+#endif //RF_RFUTILS_HPP
