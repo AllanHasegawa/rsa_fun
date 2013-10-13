@@ -7,24 +7,25 @@ namespace rf {
 	 * print_tuple is an aux class to provide partial especialization.
 	 *
 	 * It's a functional compile-time way of printing tuples.
+	 * Probably not work in EVERY case, works for this project.
 	 * Usage is simple: std::cout << std::tuple;
 	 * */
-	template<int I,int N>
+	template<int N>
 	struct print_tuple {
 		template<typename S,typename T>
 		static void print(S& o,const T& t)
 		{
-			o << std::get<N-I>(t) << ",";
-			print_tuple<I-1,N>::print(o,t);
+			print_tuple<N-1>::print(o,t);
+			o << "," << std::get<N-1>(t);
 		}
 	};
 
-	template<int N>
-	struct print_tuple<0,N> {
+	template<>
+	struct print_tuple<1> {
 		template<typename S,typename T>
 		static void print(S& o, const T& t)
 		{
-			o << std::get<N>(t);
+			o << std::get<0>(t);
 		}
 	};
 } // end namespace rf
@@ -35,8 +36,8 @@ std::basic_ostream<C,T>& operator<<(std::basic_ostream<C,T>& o,
 {
 	o << "(";
 	rf::print_tuple<
-		sizeof...(Args)-1,
-		sizeof...(Args)-1>::print(o,t);
+		sizeof...(Args)
+		>::print(o,t);
 	return o << ")";
 }
 
