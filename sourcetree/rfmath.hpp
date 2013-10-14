@@ -38,12 +38,22 @@ namespace rf {
 	 * to 25.10^9. 1980) article.
 	 *
 	 * \param Number 'N' to test primality against
-	 *
 	 * \param Miller-Rabin base 'B'
 	 *
-	 * \return True if 'N' is strongpseudoprime('B')
+	 * \return true if 'N' is strongpseudoprime('B')
 	 * */
 	bool is_prime_miller_rabin(const mpz_class& n, const long B);
+
+	/**
+	 * Implementation of the Strong Lucas Selfridge primality test
+	 * algorithm from (Pomerance; Selfridge and Wagstaff. The
+	 * Pseudoprimes to 25.10^9. 1980) article.
+	 *
+	 * \param Number 'N' to test primality against
+	 *
+	 * \return true if 'N' is a Lucas-Selfridge strong pseudoprime
+	 * */
+	bool is_prime_strong_lucas_selfridge(const mpz_class& n);
 
 	bool is_prime_BPSW(const mpz_class& n);
 

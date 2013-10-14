@@ -59,7 +59,6 @@ bool rf::is_prime_miller_rabin(const mpz_class& n, const long B)
 	auto dp = d.get_mpz_t();
 	long s;
 	__find_s_d(n, d, s);
-	std::cout << s << " " << d << std::endl;
 	
 	// if B^d mod n == 1 -> spsp(B)
 	mpz_class b{B};
@@ -71,14 +70,24 @@ bool rf::is_prime_miller_rabin(const mpz_class& n, const long B)
 	if (x == 1) return true;
 
 	// of if B^(d*(2^r)) mod n == -1 -> spsp(B)
+	//
+	// B^(d*2) = (B^d) * (B^d)
+	// B^(d*2^2) = B^(d*4) = (B^d*2) * (B^d*2)
+	// ...
 	for (long r{}; r < s; ++r) {
-		mpz_mul_2exp(xp, dp, r);
-		mpz_powm(xp, bp, xp, np);
+		mpz_mul(xp, xp, xp); // B^(d*2^r) = (B^(d*2^(r-1)))^2
+		mpz_mod(xp, xp, np); // B^(d*2^r) mod n
 		if (x == -1) return true;
 	}
 	
 	// composite
 	return false;
+}
+
+
+bool rf::is_prime_strong_lucas_selfridge(const mpz_class& n)
+{
+	return true;
 }
 
 bool rf::is_prime_BPSW(const mpz_class& n)
