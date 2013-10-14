@@ -25,9 +25,15 @@ void rf::find_2_prime_factors_naive(const mpz_class& N,
 	throw std::invalid_argument("Failed to find prime factor");
 }
 
-bool rf::is_prime_BPSW(const mpz_class& n)
+bool rf::is_obvious_composite(const mpz_class& n)
 {
-	return true;
+	if (n <= 0) return false;
+	if (n <= 3) return true;
+	auto np = n.get_mpz_t();
+
+	// if (n%2==0) composite
+	if (mpz_even_p(np)) return true;
+	return false;
 }
 
 /**
@@ -43,32 +49,40 @@ void __find_s_d(const mpz_class& n, mpz_class& d, long& s)
 	mpz_tdiv_q_2exp(dp, n1p, s); // d == (int)n / (2^s)
 }
 
-bool rf::is_prime_miller_rabin(const mpz_class& n, const int k)
+bool rf::is_prime_miller_rabin(const mpz_class& n, const long B)
 {
-	if (n <= 0) return false;
-	if (n <= 3) return true;
-	if (k <= 0) throw std::invalid_argument("k must be >0");
-	auto np = n.get_mpz_t();
-
-	// if (n%2==0) composite
-	if (mpz_divisible_ui_p(np, 2) != 0) return false;
-
+	if (is_obvious_composite(n)) return false;
+	if (B < 2) throw std::invalid_argument("B must be >1");
+	
 	// n-1 = (2^s)*d
 	mpz_class d;
+	auto dp = d.get_mpz_t();
 	long s;
 	__find_s_d(n, d, s);
-
-	auto dp = d.get_mpz_t();
 	std::cout << s << " " << d << std::endl;
-	// if 2^d mod n == 1 -> spsp(2)
-	// of if a^(d*(2^r)) mod n == -1 -> spsp(2)
-	mpz_class i2{2};
-	mpz_class r;
-	auto rp = r.get_mpz_t();
-	auto i2p = i2.get_mpz_t();
-
-	mpz_powm(rp, i2p, dp, np);
-	if (r == 1) return true;
 	
+	// if B^d mod n == 1 -> spsp(B)
+	mpz_class b{B};
+	mpz_class x;
+	auto bp = b.get_mpz_t();
+	auto xp = x.get_mpz_t();
+	auto np = n.get_mpz_t();
+	mpz_powm(xp, bp, dp, np);
+	if (x == 1) return true;
+
+	// of if B^(d*(2^r)) mod n == -1 -> spsp(B)
+	for (long r{}; r < s; ++r) {
+		mpz_mul_2exp(xp, dp, r);
+		mpz_powm(xp, bp, xp, np);
+		if (x == -1) return true;
+	}
+	
+	// composite
+	return false;
+}
+
+bool rf::is_prime_BPSW(const mpz_class& n)
+{
 	return true;
 }
+

@@ -30,7 +30,21 @@ namespace rf {
 		return true;
 	}
 
-	bool is_prime_miller_rabin(const mpz_class& n, const int k);
+	bool is_obvious_composite(const mpz_class& n);
+
+	/**
+	 * Implementation of the Miller-Rabin primality test algorithm
+	 * from (Pomerance; Selfridge and Wagstaff. The Pseudoprimes
+	 * to 25.10^9. 1980) article.
+	 *
+	 * \param Number 'N' to test primality against
+	 *
+	 * \param Miller-Rabin base 'B'
+	 *
+	 * \return True if 'N' is strongpseudoprime('B')
+	 * */
+	bool is_prime_miller_rabin(const mpz_class& n, const long B);
+
 	bool is_prime_BPSW(const mpz_class& n);
 
 	void find_2_prime_factors_naive(const mpz_class& N,

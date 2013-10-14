@@ -55,6 +55,6 @@ int main(void) {
 	rf::decrypt(r, d, n, r);
 	cout << r << endl;
 
-	rf::is_prime_miller_rabin(589, 10);
+	cout << rf::is_prime_miller_rabin(213, 2) << endl;
 	return 0;
 }
