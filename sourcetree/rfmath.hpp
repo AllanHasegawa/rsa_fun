@@ -18,7 +18,8 @@ namespace rf {
 	}
 	
 	template<typename T>
-	bool is_prime_naive(const T& n) {
+	bool is_prime_naive(const T& n) 
+	{
 		if (n <= 0) return false;
 		T i{2};
 		const auto m = sqrt(n);
@@ -28,6 +29,9 @@ namespace rf {
 		}
 		return true;
 	}
+
+	bool is_prime_miller_rabin(const mpz_class& n, const int k);
+	bool is_prime_BPSW(const mpz_class& n);
 
 	void find_2_prime_factors_naive(const mpz_class& N,
 				mpz_class& x, mpz_class& y);
