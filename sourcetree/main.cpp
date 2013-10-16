@@ -1,7 +1,4 @@
 #include <iostream>
-#include <tuple>
-#include "gmpxx.h"
-#include "rfmath.hpp"
 #include "rfutils.hpp"
 #include "rsafun.hpp"
 
@@ -10,7 +7,12 @@ int main(int argc, char* argv[]) {
 
 	using PB = rf::PrimeBuffer<mpz_class>;
 	PB{10000};
-	const auto& PBv = PB::value;
+
+	auto f = rf::file_to_bytes("message1");
+
+
+
+	rf::bytes_to_file("message2", f);
 
 	return 0;
 }

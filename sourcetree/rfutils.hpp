@@ -1,6 +1,7 @@
 #ifndef RF_RFUTILS_HPP
 #define RF_RFUTILS_HPP
-
+#include <fstream>
+#include <vector>
 #include <tuple>
 #include <ostream>
 
@@ -43,5 +44,43 @@ std::basic_ostream<C,T>& operator<<(std::basic_ostream<C,T>& o,
 		>::print(o,t);
 	return o << ")";
 }
+
+
+namespace rf {
+	std::vector<uint8_t> file_to_bytes(const std::string& file_name)
+	{
+		using namespace std;
+		ifstream fs(file_name, istream::binary);
+		if (!fs) throw std::invalid_argument("File (" + file_name
+				+ ") not found");
+		fs.seekg(0, fs.end);
+		int size = fs.tellg();
+		fs.seekg(0, fs.beg);
+
+		std::vector<uint8_t> r;
+		r.reserve(size);
+
+		char ch;
+		while (fs.get(ch)) {
+			r.push_back(
+				static_cast<uint8_t>(ch));
+		}
+		return r;
+	}
+
+	void bytes_to_file(const std::string& file_name,
+			const std::vector<uint8_t>& b)
+	{
+		using namespace std;
+		ofstream fs(file_name, ofstream::binary);
+
+		if (!fs) throw std::invalid_argument("File (" + file_name
+				+ ") failed to be opened");
+		
+		for (auto& B : b) {
+			fs.put(B);
+		}
+	}
+} // end namespace rf
 
 #endif //RF_RFUTILS_HPP
