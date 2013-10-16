@@ -16,13 +16,12 @@ int main(void) {
 	for (int i = 0; i < 10; ++i)
 	for_each (PBv.begin(), PBv.end(),
 		[] (const mpz_class& v) {
-			if (!rf::is_prime_in_blocks(v,2))
+			if (!rf::is_prime_in_blocks(v))
 				cout << "F: " << v << endl;
 			}
 	);
 
 
-	rf::is_prime_in_blocks(211, 3);
 	cout << rf::extended_euclidean(120,67) << endl;
 
 	cout << endl << string(25,'-') << endl;

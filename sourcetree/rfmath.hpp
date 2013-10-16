@@ -21,7 +21,7 @@ namespace rf {
 
 	bool is_prime_fermat(const mpz_class& n, const int p, const int t);
 
-	bool is_prime_in_blocks(const mpz_class& n, const int BS);
+	bool is_prime_in_blocks(const mpz_class& n);
 
 	bool is_obvious_composite(const mpz_class& n);
 
