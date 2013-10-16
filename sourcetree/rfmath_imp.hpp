@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <tuple>
 
@@ -43,6 +44,20 @@ namespace rf {
 					}
 				}
 			}
+		}
+
+		static bool search_prime(const T& n)
+		{
+			int a{};
+			int b{static_cast<int>(value.size())};
+
+			while (b >= a) {
+				int c = a + ((b-a)/2);
+				if (value[c] == n) return true;
+				if (value[c] < n) a = c + 1;
+				else b = c - 1;
+			}
+			return false;
 		}
 	};
 	template<typename T>

@@ -46,7 +46,6 @@ bool rf::is_prime_fermat(const mpz_class& n, const int p, const int t)
 bool rf::is_prime_in_blocks(const mpz_class& n)
 {
 	if (is_obvious_composite(n)) return false;
-
 	if (n < 30*30) return is_prime_naive(n);
 
 	// 30k + {1, 7, 11, 13, 17, 19, 23, 29}
@@ -162,11 +161,13 @@ bool rf::is_prime_miller_rabin(const mpz_class& n, const long B)
 
 bool rf::is_prime_strong_lucas_selfridge(const mpz_class& n)
 {
+	throw std::runtime_error("Not implemented");
 	return true;
 }
 
 bool rf::is_prime_BPSW(const mpz_class& n)
 {
+	throw std::runtime_error("Not implemented");
 	return true;
 }
 
