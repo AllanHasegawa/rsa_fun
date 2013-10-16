@@ -27,6 +27,7 @@ target_link_libraries(rsafun ${GMPXX_LIBRARIES})
 set(UNIT_TESTS_SRCS
 	${SRCS}
 	ut_primes.cpp
+	ut_rsafun.cpp
 )
 
 add_executable(unittests ${UNIT_TESTS_SRCS})
