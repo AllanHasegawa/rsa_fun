@@ -9,22 +9,9 @@ int main(void) {
 	using namespace std;
 
 	using PB = rf::PrimeBuffer<mpz_class>;
-	PB{1000};
+	PB{10000};
 
 	const auto& PBv = PB::value;
-
-	for_each (PBv.begin(), PBv.end(),
-		[] (const mpz_class& v) {
-			if (!rf::is_prime_in_blocks(v))
-				cout << "F: " << v << endl;
-			}
-	);
-
-	int c{};
-	for (long i{2}; i <= PB::value.back(); ++i) {
-		if (PB::search_prime(i)) ++c;
-	}
-	if (c != 1000) cout << "F c" << endl;
 
 	cout << rf::extended_euclidean(120,67) << endl;
 

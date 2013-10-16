@@ -36,8 +36,9 @@ namespace rf {
 		{
 			if (value.empty()) {
 				value.reserve(np);
-				T n{2};
-				for (int i{0}; i < np; ++n) {
+				value.push_back(2);
+				T n{3};
+				for (int i{1}; i < np; n+=2) {
 					if (is_prime_naive<T>(n)) {
 						value.push_back(n);
 						++i;
