@@ -1,10 +1,57 @@
 #include <iostream>
 #include <random>
 #include <stdexcept>
+#include <vector>
 #include "gmpxx.h"
 #include "gmp.h"
 #include "rfmath.hpp"
 
+
+bool rf::is_prime_fermat(const mpz_class& n, const int p, const int t)
+{
+	if (t < 1) throw std::invalid_argument("t must be >0");
+	if (p < 1) throw std::invalid_argument("p must be >0");
+	if (n <= 0) return false;
+	if (n <= 3) return true;
+
+	auto np = n.get_mpz_t();
+	mpz_class n1{n-1};
+	auto n1p = n1.get_mpz_t();
+	
+	// sequential algorithm
+	if (t == 1) {
+		gmp_randstate_t rs;
+		gmp_randinit_mt(rs);
+		gmp_randseed_ui(rs, std::random_device{}());
+
+		mpz_class ri;
+		auto rip = ri.get_mpz_t();
+
+		for (int i{}; i < p; ++i) {
+			do {
+				mpz_urandomm(rip, rs, np);
+			} while (ri < 1);
+
+			mpz_powm(rip, rip, n1p, np);
+			if (ri != 1) {
+				gmp_randclear(rs);
+				return false; // composite for sure
+			}
+		}
+		gmp_randclear(rs);
+	}
+	return true; // probable prime
+}
+
+bool rf::is_prime_in_blocks(const mpz_class& n, const int BS)
+{
+	if (is_obvious_composite(n)) return false;
+	if (BS < 1) throw std::invalid_argument("BS must be >=1");
+
+		
+
+	return true;
+}
 
 void rf::find_2_prime_factors_naive(const mpz_class& N,
 	mpz_class& x, mpz_class& y)

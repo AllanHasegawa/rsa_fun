@@ -8,13 +8,10 @@
 int main(void) {
 	using namespace std;
 
-	cout << rf::extended_euclidean(120,67) << endl;
+	using PB = rf::PrimeBuffer<long>;
+	PB{10000};
 
-	for (int i = 0; i < 100; ++i) {
-		if (rf::is_prime_naive(i)) {
-			cout << i << endl;
-		}
-	}
+	cout << rf::extended_euclidean(120,67) << endl;
 
 	cout << endl << string(25,'-') << endl;
 
