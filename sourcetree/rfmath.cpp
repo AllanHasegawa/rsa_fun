@@ -46,9 +46,56 @@ bool rf::is_prime_fermat(const mpz_class& n, const int p, const int t)
 bool rf::is_prime_in_blocks(const mpz_class& n, const int BS)
 {
 	if (is_obvious_composite(n)) return false;
-	if (BS < 1) throw std::invalid_argument("BS must be >=1");
+	if (BS <= 1) throw std::invalid_argument("BS must be >=2");
 
-		
+	const auto& PB = PrimeBuffer<mpz_class>::value;
+
+	long block{1};
+	for (int i{0}; i < BS; ++i) {
+		block *= PB[i].get_si();
+	}
+
+	if (n <= block) return is_prime_naive(n);
+
+	// 6k + {1, 5}
+	// 7 = 6*1 + 1
+	// 11 = 6*1 + 5
+	// 23 = 6*3 + 5
+	// 29 = 6*4 + 5
+	// ...
+	
+	auto np = n.get_mpz_t();
+	mpz_class t;
+	auto tp = t.get_mpz_t();
+	for (long i{2},c{1}; i <= block;++c) {
+		t = i;
+		if (mpz_divisible_p(np, tp)) return false;
+		i = PB[c].get_si();
+	}
+	
+	auto PBd = PB.data();
+	std::vector<mpz_srcptr> list;
+	for (int i{BS}; PB[i] < block; ++i) {
+		list.push_back(
+			static_cast<mpz_srcptr>(PBd[i].get_mpz_t()));
+	}
+
+	mpz_class i{block};
+	auto ip = i.get_mpz_t();
+
+	mpz_class ns;
+	auto nsp = ns.get_mpz_t();
+	mpz_sqrt(nsp,np);
+	++ns;
+	const int ls = list.size();
+	for (; i < ns; i += block) {
+		mpz_add_ui(tp, ip, 1);
+		if (mpz_divisible_p(np, tp)) return false;
+		for (int j{}; j < ls; ++j) {
+			mpz_add(tp, ip, list[j]);
+			if (mpz_divisible_p(np, tp)) return false;
+		}
+	}
 
 	return true;
 }

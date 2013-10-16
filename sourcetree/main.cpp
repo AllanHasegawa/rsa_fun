@@ -8,9 +8,21 @@
 int main(void) {
 	using namespace std;
 
-	using PB = rf::PrimeBuffer<long>;
-	PB{10000};
+	using PB = rf::PrimeBuffer<mpz_class>;
+	PB{100000};
 
+	const auto& PBv = PB::value;
+
+	for (int i = 0; i < 10; ++i)
+	for_each (PBv.begin(), PBv.end(),
+		[] (const mpz_class& v) {
+			if (!rf::is_prime_in_blocks(v,2))
+				cout << "F: " << v << endl;
+			}
+	);
+
+
+	rf::is_prime_in_blocks(211, 3);
 	cout << rf::extended_euclidean(120,67) << endl;
 
 	cout << endl << string(25,'-') << endl;
