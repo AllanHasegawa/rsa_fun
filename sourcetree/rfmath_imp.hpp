@@ -18,12 +18,12 @@ namespace rf {
 	template<typename T>
 	bool is_prime_naive(const T& n) 
 	{
-		if (n <= 0) return false;
-		T i{2};
+		if (is_obvious_composite(n)) return false;
+		T i{5};
 		const auto m = sqrt(n);
 		while(i <= m) {
 			if (n%i == 0) return false;
-			++i;
+			i+=2;
 		}
 		return true;
 	}

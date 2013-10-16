@@ -46,6 +46,8 @@ bool rf::is_prime_fermat(const mpz_class& n, const int p, const int t)
 bool rf::is_prime_in_blocks(const mpz_class& n)
 {
 	if (is_obvious_composite(n)) return false;
+	if (n < PrimeBuffer<mpz_class>::value.back())
+		return PrimeBuffer<mpz_class>::search_prime(n);
 	if (n < 30*30) return is_prime_naive(n);
 
 	// 30k + {1, 7, 11, 13, 17, 19, 23, 29}
