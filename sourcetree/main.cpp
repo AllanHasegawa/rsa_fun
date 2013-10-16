@@ -9,7 +9,7 @@ int main(void) {
 	using namespace std;
 
 	using PB = rf::PrimeBuffer<mpz_class>;
-		PB{1000};
+	PB{1000};
 
 	const auto& PBv = PB::value;
 
@@ -46,6 +46,10 @@ int main(void) {
 	// factor the N from public key
 	mpz_class x, y;
 	rf::find_2_prime_factors_naive(n, x, y);
+	cout << x << "," << y << endl;
+
+	mpz_class t1{71443L*102523L};
+	rf::find_2_prime_factors_blocks(t1, x, y);
 	cout << x << "," << y << endl;
 
 	// fist make (p-1)*(q-1)
