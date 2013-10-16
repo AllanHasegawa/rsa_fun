@@ -6,7 +6,8 @@ Vazirani, 2006).
 
 
 It is *NOT* an optimal solution. High performance functions already implemented
-and available were not used.
+and available in open-source libraries were not used, apart from basic
+arithmetics.
 
 ## Dependency
 
