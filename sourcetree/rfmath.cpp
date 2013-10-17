@@ -1,3 +1,4 @@
+#include <mutex>
 #include <future>
 #include <iostream>
 #include <random>
@@ -7,6 +8,93 @@
 #include "gmp.h"
 #include "rfmath.hpp"
 
+
+void rf::binary_gcd(const mpz_class& a, const mpz_class& b, mpz_class& r)
+{
+	if (a == 0) r = b;
+	if (b == 0) r = a;
+
+	
+	mpz_class x = a;
+	mpz_class y = b;
+
+	auto xp = x.get_mpz_t();
+	auto yp = y.get_mpz_t();
+
+	mpz_class t;
+	auto tp = t.get_mpz_t();
+	mpz_ior(tp, xp, yp);
+
+	int ctz_xy = mpz_scan1(tp, 0);
+	int ctz_x = mpz_scan1(xp, 0);
+	int ctz_y;
+	mpz_tdiv_q_2exp(xp, xp, ctz_x);
+	while(true) {
+		ctz_y = mpz_scan1(yp, 0);
+		mpz_tdiv_q_2exp(yp, yp, ctz_y);
+
+		if (x == y) break;
+		if (x > y) std::swap(x, y);
+		if (x == 1) break;
+
+		y -= x;
+	}
+
+	auto rp = r.get_mpz_t();
+	mpz_mul_2exp(rp, xp, ctz_xy);
+}
+
+void rf::random_coprime(const mpz_class& n, const int precision_bits,
+			const int threads, mpz_class& coprime)
+{
+	if (precision_bits < 2)
+		throw std::invalid_argument("Precision bits must be >=2");
+	if (n < 2)
+		throw std::invalid_argument("n must be >=2");
+	if (threads < 1)
+		throw std::invalid_argument("threads must be >=1");
+
+	using namespace std;
+	atomic_bool found_coprime;
+	found_coprime = false;
+
+	vector<future<void>> jobs;
+	mutex copy;
+	for (int i{}; i < threads; ++i) {
+		jobs.push_back(async(launch::async, [&]() {
+			gmp_randstate_t rs;
+			gmp_randinit_mt(rs);
+			gmp_randseed_ui(rs, std::random_device{}());
+
+			mpz_class r;
+			auto rp = r.get_mpz_t();
+			int c{};	
+			mpz_class t;
+
+			while(true) {
+				do {
+					mpz_urandomb(rp, rs, precision_bits); 
+				} while (r < 2);
+				binary_gcd(r, n, t);
+				// only coprimes should try to copy
+				// to shared variable,
+				// and when they do, one at a time ;)
+				if (t == 1) {
+					std::lock_guard<mutex> l(copy);
+					found_coprime = true;
+					coprime = r;
+					break;
+				}
+				++c;
+				if (c%10 == 0) {
+					if (found_coprime) break;
+				}
+			}
+			gmp_randclear(rs);
+		}));
+	}
+
+}
 
 void rf::random_prime(const int precision_bits, const int fermat_passes,
 			const int threads, mpz_class& prime)
@@ -168,14 +256,16 @@ void rf::find_2_prime_factors_naive(const mpz_class& N,
 	mpz_class t{2};
 	auto Np = N.get_mpz_t();
 	auto tp = t.get_mpz_t();
+	if (mpz_divisible_p(Np,tp)) return; 
+	t += 1;
 	while (t < N) {
 		// if (N%t) == 0
-		if (mpz_divisible_p(Np, tp) != 0) {
+		if (mpz_divisible_p(Np, tp)) {
 			x = t;
 			y = N/t;
 			return;
 		}
-		++t;
+		t += 2;
 	}
 
 	throw std::invalid_argument("Failed to find prime factor");

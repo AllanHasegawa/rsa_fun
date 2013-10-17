@@ -12,6 +12,11 @@ namespace rf {
 	template<typename T>
 	std::tuple<T,T,T> extended_euclidean(const T& a, const T& b);
 
+	void binary_gcd(const mpz_class& a, const mpz_class& b, mpz_class& r);
+
+	void random_coprime(const mpz_class& n, const int precision_bits,
+			const int threads, mpz_class& coprime);
+
 	void jacobi_number(const mpz_class& a,
 			const mpz_class& b, mpz_class& n);
 	
