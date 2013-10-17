@@ -10,23 +10,9 @@ int main(int argc, char* argv[]) {
 	using PB = rf::PrimeBuffer<mpz_class>;
 	PB{100};
 
-	int precision_bits = 32;
+	int precision_bits = 38;
 	int threads = 8;
 	auto f = rf::file_to_bytes("message1");
-
-	mpz_class p;
-	mpz_class q;
-	rf::random_prime(precision_bits, 100, threads, p);
-	rf::random_prime(precision_bits, 100, threads, q);
-
-	mpz_class pq{(p-1)*(q-1)};
-
-	mpz_class n{p*q};
-
-	mpz_class e;
-	rf::random_coprime(pq, precision_bits, threads, e);
-	cout << "e: " << e << endl;
-
 
 	mpz_class x;
 	mpz_class y;
