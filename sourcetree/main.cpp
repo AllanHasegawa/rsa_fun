@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 	using PB = rf::PrimeBuffer<mpz_class>;
 	PB{100};
 
-	int precision_bits = 32;
+	int precision_bits = 64;
 	int threads = 8;
 	auto f = rf::file_to_bytes("message1");
 
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 	cout << "e: " << e << endl;
 
 
-	rf::find_2_prime_factors_blocks(n, x, y);
+	rf::find_2_prime_factors_blocks(n, threads, x, y);
 	cout << "n: " << n << endl;
 	cout << "xy:" << x * y << endl;
 	cout << "x: " << x << endl;

@@ -32,10 +32,11 @@ namespace rf {
 	}
 
 	void decrypt_with_public_key(const mpz_class& C, const mpz_class& e,
-			const mpz_class& n, mpz_class& result)
+			const mpz_class& n, const int threads,
+			mpz_class& result)
 	{
 		mpz_class x, y;
-		rf::find_2_prime_factors_blocks(n, x, y);
+		rf::find_2_prime_factors_blocks(n, threads, x, y);
 	
 		// fist make (p-1)*(q-1)
 		mpz_class pq{(x-1)*(y-1)};

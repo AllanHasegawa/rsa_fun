@@ -30,7 +30,7 @@ go_bandit([]() {
 		it("decrypt_with_public_key 27", [&]() {
 			// now decrypt!
 			mpz_class c = r;
-			rf::decrypt_with_public_key(c, e, n, r);
+			rf::decrypt_with_public_key(c, e, n, 8, r);
 			AssertThat(r, Equals(92));
 		});
 	});

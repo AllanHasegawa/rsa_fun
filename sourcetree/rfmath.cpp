@@ -271,7 +271,7 @@ void rf::find_2_prime_factors_naive(const mpz_class& N,
 	throw std::invalid_argument("Failed to find prime factor");
 }
 
-void rf::find_2_prime_factors_blocks(const mpz_class& n,
+void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 				mpz_class& x, mpz_class& y)
 {
 	if (n <= 6) throw std::invalid_argument("n must be >= 6");
@@ -290,108 +290,135 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n,
 		}
 	}
 
-	mpz_class t;
-	auto tp = t.get_mpz_t();
-	
-	mpz_class i{210};
-	auto ip = i.get_mpz_t();
-	mpz_class ns;
-	auto nsp = ns.get_mpz_t();
-	mpz_sqrt(nsp, np);
-	for (; i <= ns; i += 210) {
-		mpz_add_ui(tp, ip, 1);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 11);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 13);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 17);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 19);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 23);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 29);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 31);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 37);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 41);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 43);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 47);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 53);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 59);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 61);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 67);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 71);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 73);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 79);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 83);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 89);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 97);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 101);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 103);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 107);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 109);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 113);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 127);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 131);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 137);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 139);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 149);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 151);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 157);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 163);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 167);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 173);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 179);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 181);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 191);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 193);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 197);
-		if (mpz_divisible_p(np, tp)) break;
-		mpz_add_ui(tp, ip, 199);
-		if (mpz_divisible_p(np, tp)) break;
+	using namespace std;
+
+	mutex copy_mutex;
+	atomic_bool found_factor;
+	found_factor = false;
+	vector<future<void>> jobs;
+	for (int i{}; i < threads; ++i) {
+		jobs.push_back(async(launch::async,[&](int ID){
+
+		mpz_class t;
+		auto tp = t.get_mpz_t();
+		// thread 1 starts at 210
+		// "      2 "         210*2
+		// ...
+		mpz_class i{210*(ID+1)};
+		auto ip = i.get_mpz_t();
+		mpz_class ns;
+		auto nsp = ns.get_mpz_t();
+		mpz_sqrt(nsp, np);
+
+		unsigned c{};
+		// every iteration jumps the others threads works
+		for (; i <= ns; i += 210*threads) {
+			++c;
+			// lets not interrupt others threads
+			// all the time. Be Polite!
+			if (c%100 == 0) {
+				if (found_factor) {
+					return;
+				}
+			}
+			mpz_add_ui(tp, ip, 1);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 11);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 13);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 17);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 19);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 23);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 29);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 31);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 37);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 41);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 43);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 47);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 53);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 59);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 61);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 67);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 71);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 73);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 79);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 83);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 89);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 97);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 101);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 103);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 107);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 109);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 113);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 127);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 131);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 137);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 139);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 149);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 151);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 157);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 163);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 167);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 173);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 179);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 181);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 191);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 193);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 197);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add_ui(tp, ip, 199);
+			if (mpz_divisible_p(np, tp)) break;
+		}
+		if (mpz_divisible_p(np, tp)) {
+			lock_guard<mutex> l(copy_mutex);
+			found_factor = true;
+			x = t;
+			y = n/x;
+		} else {
+			throw std::runtime_error("No factors found.");
+		}
+	}, i));
 	}
-	if (mpz_divisible_p(np, tp)) {
-		x = t;
-		y = n/x;
-	} else {
-		throw std::runtime_error("No factors found.");
-	}
+
 }
 
 bool rf::is_obvious_composite(const mpz_class& n)

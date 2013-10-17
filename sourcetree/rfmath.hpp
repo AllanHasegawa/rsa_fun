@@ -61,8 +61,8 @@ namespace rf {
 	void find_2_prime_factors_naive(const mpz_class& N,
 				mpz_class& x, mpz_class& y);
 
-	void find_2_prime_factors_blocks(const mpz_class& N,
-				mpz_class& x, mpz_class& y);
+	void find_2_prime_factors_blocks(const mpz_class& n,
+			const int threads, mpz_class& x, mpz_class& y);
 } // end namespace rf
 
 #include "rfmath_imp.hpp"
