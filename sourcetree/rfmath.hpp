@@ -6,6 +6,8 @@
 #include "gmpxx.h"
 
 namespace rf {
+	void random_prime(const int precision_bits, const int fermat_passes,
+			const int threads, mpz_class& prime);
 	
 	template<typename T>
 	std::tuple<T,T,T> extended_euclidean(const T& a, const T& b);
@@ -19,7 +21,8 @@ namespace rf {
 	template<typename T>
 	bool is_prime_naive(const T& n);
 
-	bool is_prime_fermat(const mpz_class& n, const int p, const int t);
+	bool is_prime_fermat(const mpz_class& n, const int passes,
+						const int threads);
 
 	bool is_prime_in_blocks(const mpz_class& n);
 

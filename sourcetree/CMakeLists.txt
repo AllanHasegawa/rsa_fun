@@ -8,7 +8,7 @@ include_directories(${GMP_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR})
 
 
-set(CMAKE_CXX_FLAGS "-Wall -pipe -std=c++11")
+set(CMAKE_CXX_FLAGS "-Wall -pipe -std=c++11 -pthreads")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fomit-frame-pointer -march=native")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 

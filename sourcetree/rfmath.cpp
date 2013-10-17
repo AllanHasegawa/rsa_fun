@@ -1,3 +1,4 @@
+#include <future>
 #include <iostream>
 #include <random>
 #include <stdexcept>
@@ -7,31 +8,89 @@
 #include "rfmath.hpp"
 
 
-bool rf::is_prime_fermat(const mpz_class& n, const int p, const int t)
+void rf::random_prime(const int precision_bits, const int fermat_passes,
+			const int threads, mpz_class& prime)
 {
-	if (t < 1) throw std::invalid_argument("t must be >0");
-	if (p < 1) throw std::invalid_argument("p must be >0");
-	if (n <= 0) return false;
-	if (n <= 3) return true;
+	if (precision_bits < 2)
+		throw std::invalid_argument("Precision bits must be >=2");
+
+	gmp_randstate_t rs;
+	gmp_randinit_mt(rs);
+	gmp_randseed_ui(rs, std::random_device{}());
+
+	auto primep = prime.get_mpz_t();
+	while(true) {
+		mpz_urandomb(primep, rs, precision_bits); 
+		if (mpz_even_p(primep)) prime += 1;
+		if (is_prime_fermat(prime,
+			fermat_passes, threads)) break;
+	}
+	gmp_randclear(rs);
+}
+
+void  __is_prime_fermat_parallel(const mpz_class& n, const int passes,
+		std::atomic_bool& r) {
+	using namespace std;
 
 	auto np = n.get_mpz_t();
 	mpz_class n1{n-1};
 	auto n1p = n1.get_mpz_t();
 	
-	// sequential algorithm
-	if (t == 1) {
-		gmp_randstate_t rs;
-		gmp_randinit_mt(rs);
-		gmp_randseed_ui(rs, std::random_device{}());
+	gmp_randstate_t rs;
+	gmp_randinit_mt(rs);
+	gmp_randseed_ui(rs, std::random_device{}());
 
-		mpz_class ri;
-		auto rip = ri.get_mpz_t();
+	mpz_class ri;
+	auto rip = ri.get_mpz_t();
 
-		for (int i{}; i < p; ++i) {
+	for (int i{}; i < passes; ++i) {
+		if (r) {
 			do {
 				mpz_urandomm(rip, rs, np);
 			} while (ri < 1);
 
+			mpz_powm(rip, rip, n1p, np);
+			if (ri != 1) {
+				r = false;
+				break;
+				// composite for sure
+			}
+		} else {
+			break;
+		}
+	}
+	gmp_randclear(rs);
+	// probable prime
+}
+
+bool rf::is_prime_fermat(const mpz_class& n, const int passes,
+						const int threads)
+{
+	if (threads < 1) throw std::invalid_argument("threads must be >=1");
+	if (passes < 1) throw std::invalid_argument("passes must be >0");
+	if (n <= 0) return false;
+	if (n <= 3) return true;
+
+	using namespace std;
+
+	// sequential part
+	if (threads == 1) {
+		auto np = n.get_mpz_t();
+		mpz_class n1{n-1};
+		auto n1p = n1.get_mpz_t();
+		
+		gmp_randstate_t rs;
+		gmp_randinit_mt(rs);
+		gmp_randseed_ui(rs, std::random_device{}());
+	
+		mpz_class ri;
+		auto rip = ri.get_mpz_t();
+	
+		for (int i{}; i < passes; ++i) {
+			do {
+				mpz_urandomm(rip, rs, np);
+			} while (ri < 1);
+	
 			mpz_powm(rip, rip, n1p, np);
 			if (ri != 1) {
 				gmp_randclear(rs);
@@ -39,8 +98,26 @@ bool rf::is_prime_fermat(const mpz_class& n, const int p, const int t)
 			}
 		}
 		gmp_randclear(rs);
+		return true; // probable prime
+	// parallel part
+	} else {
+		atomic_bool r;
+		r = true;
+		vector<future<void>> jobs;	
+		for (int i{}; i < threads; ++i) {
+			jobs.push_back(
+				async(launch::async, [&]() {
+					return __is_prime_fermat_parallel(n,
+						passes/threads, r);
+			}));
+		}
+
+		for (auto i = jobs.begin(); i != jobs.end(); ++i) {
+			i->wait();
+		}
+
+		return r;
 	}
-	return true; // probable prime
 }
 
 bool rf::is_prime_in_blocks(const mpz_class& n)
