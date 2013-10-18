@@ -278,8 +278,10 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 				mpz_class& x, mpz_class& y)
 {
 	if (n <= 6) throw std::invalid_argument("n must be >= 6");
-
 	const auto& PB = PrimeBuffer<mpz_class>::value;
+	PrimeBuffer<mpz_class>{100};
+	using namespace std;
+
 	if (PB.back() < 210) 
 		throw std::runtime_error("PrimeBuffer not enough!");
 
@@ -501,7 +503,6 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 		}
 		if (mpz_divisible_p(np, tp)) {
 			lock_guard<mutex> l(copy_mutex);
-			std::cout << ID << "F" << std::endl;
 			found_factor = true;
 			x = t;
 			y = n/x;
