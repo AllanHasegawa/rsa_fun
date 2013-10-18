@@ -34,11 +34,16 @@ namespace rf {
 
 		PrimeBuffer(const int np)
 		{
-			if (value.empty()) {
-				value.reserve(np);
-				value.push_back(2);
-				T n{3};
-				for (int i{1}; i < np; n+=2) {
+			if (value.size() < np) {
+				if (value.size() == 0) value.push_back(2);
+
+				T n;
+				if (value.size() == 1) n = 3;
+				else n = value.back()+1;
+
+				if (n%2 == 0) ++n;
+
+				for (int i = value.size(); i < np; n+=2) {
 					if (is_prime_naive<T>(n)) {
 						value.push_back(n);
 						++i;
