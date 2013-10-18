@@ -30,6 +30,7 @@ set(UNIT_TESTS_SRCS
 	${SRCS}
 	ut_primes.cpp
 	ut_rsafun.cpp
+	ut_rsafun2.cpp
 )
 
 add_executable(unittests ${UNIT_TESTS_SRCS})
