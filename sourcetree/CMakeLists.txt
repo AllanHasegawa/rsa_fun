@@ -51,3 +51,11 @@ set(CRYPT_SRCS
 
 add_executable(rsacrypt ${CRYPT_SRCS})
 target_link_libraries(rsacrypt ${GMPXX_LIBRARIES})
+
+set(DECRYPT_SRCS
+	${SRCS}
+	decrypt.cpp
+)
+
+add_executable(rsadecrypt ${DECRYPT_SRCS})
+target_link_libraries(rsadecrypt ${GMPXX_LIBRARIES})
