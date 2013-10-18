@@ -16,6 +16,7 @@ set(SRCS
 	rfmath.cpp
 	rsafun.cpp
 	)
+
 set(MAIN_SRCS
 	${SRCS}
 	main.cpp
@@ -33,3 +34,12 @@ set(UNIT_TESTS_SRCS
 
 add_executable(unittests ${UNIT_TESTS_SRCS})
 target_link_libraries(unittests ${GMPXX_LIBRARIES})
+
+
+set(GEN_SRCS
+	${SRCS}
+	gen.cpp
+)
+
+add_executable(rsagen ${GEN_SRCS})
+target_link_libraries(rsagen ${GMPXX_LIBRARIES})
