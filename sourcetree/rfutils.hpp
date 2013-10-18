@@ -4,7 +4,8 @@
 #include <vector>
 #include <tuple>
 #include <ostream>
-
+#include "cereal/archives/binary.hpp"
+#include "rsafun.hpp"
 
 namespace rf {
 	/**
@@ -80,6 +81,55 @@ namespace rf {
 		for (auto& B : b) {
 			fs.put(B);
 		}
+	}
+
+	void save_keys(const RSAKeyPair& keys, const std::string filename)
+	{
+		using namespace std;
+		ofstream ofs_pub(filename + ".pub");
+		ofstream ofs_priv(filename + ".priv");
+
+		cereal::BinaryOutputArchive boa_pub(ofs_pub);
+		cereal::BinaryOutputArchive boa_priv(ofs_priv);
+
+		boa_priv(keys.first);
+		boa_pub(keys.second);
+	}
+
+	RSAPrivateKey open_private_key(const std::string filename)
+	{
+		using namespace std;
+
+		ifstream ifs_pub(filename);
+		cereal::BinaryInputArchive bia_pub(ifs_pub);
+
+		std::string dstr;
+		std::string nstr;
+		bia_pub(dstr, nstr);
+
+		rf::RSAPrivateKey private_key;
+		private_key.d = mpz_class{dstr.c_str(), 16};
+		private_key.n = mpz_class{nstr.c_str(), 16};
+
+		return private_key;
+	}
+
+	RSAPublicKey open_public_key(const std::string filename)
+	{
+		using namespace std;
+
+		ifstream ifs_pub(filename);
+		cereal::BinaryInputArchive bia_pub(ifs_pub);
+
+		std::string estr;
+		std::string nstr;
+		bia_pub(estr, nstr);
+
+		rf::RSAPublicKey public_key;
+		public_key.e = mpz_class{estr.c_str(), 16};
+		public_key.n = mpz_class{nstr.c_str(), 16};
+
+		return public_key;
 	}
 } // end namespace rf
 
