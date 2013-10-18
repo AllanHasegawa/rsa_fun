@@ -43,3 +43,11 @@ set(GEN_SRCS
 
 add_executable(rsagen ${GEN_SRCS})
 target_link_libraries(rsagen ${GMPXX_LIBRARIES})
+
+set(CRYPT_SRCS
+	${SRCS}
+	crypt.cpp
+)
+
+add_executable(rsacrypt ${CRYPT_SRCS})
+target_link_libraries(rsacrypt ${GMPXX_LIBRARIES})
