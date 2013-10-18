@@ -1,14 +1,12 @@
 #include <iostream>
+#include <fstream>
 #include "gmp.h"
+#include "gmpxx.h"
+#include "rfutils.hpp"
+#include "rsafun.hpp"
 
-int main(void) {
+int main(int argc, char* argv[]) {
 	using namespace std;
-	mpz_t sum;
-	mpz_init(sum);
-	mpz_set_str(sum, "12345", 10);
-	cout << sum << endl;
-	mpz_clear(sum);
-	int i{};
-	cout << i << endl;
+	
 	return 0;
 }
