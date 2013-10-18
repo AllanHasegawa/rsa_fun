@@ -14,22 +14,6 @@ int main(int argc, char* argv[]) {
 	int threads = 8;
 	auto f = rf::file_to_bytes("message1");
 
-	mpz_class x;
-	mpz_class y;
-	rf::find_2_prime_factors_blocks(n, threads, x, y);
-	cout << "n: " << n << endl;
-	cout << "xy:" << x * y << endl;
-	cout << "x: " << x << endl;
-	cout << "y: " << y << endl;
-
-	if (x*y == 0)
-		rf::find_2_prime_factors_naive(n, x, y);
-	cout << string(25, '-') << endl;
-	cout << "n: " << n << endl;
-	cout << "xy:" << x * y << endl;
-	cout << "x: " << x << endl;
-	cout << "y: " << y << endl;
-
 	rf::bytes_to_file("message2", f);
 
 	return 0;

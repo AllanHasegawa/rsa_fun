@@ -20,17 +20,21 @@ go_bandit([]() {
 		mpz_class e{17};
 		mpz_class r;
 
+		RSAPublicKey public_key;
+		public_key.n = n;
+		public_key.e = e;
+
 		it("crypt 92", [&]() {
 			// original msg
 			// crypt using plubic key values
-			rf::crypt(92, e, n, r);
+			rf::crypt(92, public_key, r);
 			AssertThat(r, Equals(27));
 		});
 
 		it("decrypt_with_public_key 27", [&]() {
 			// now decrypt!
 			mpz_class c = r;
-			rf::decrypt_with_public_key(c, e, n, 8, r);
+			rf::decrypt_with_public_key(c, public_key, 8, r);
 			AssertThat(r, Equals(92));
 		});
 	});
