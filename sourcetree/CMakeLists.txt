@@ -59,3 +59,12 @@ set(DECRYPT_SRCS
 
 add_executable(rsadecrypt ${DECRYPT_SRCS})
 target_link_libraries(rsadecrypt ${GMPXX_LIBRARIES})
+
+
+set(BREAKCRYPT_SRCS
+	${SRCS}
+	breakcrypt.cpp
+)
+
+add_executable(rsabreakcrypt ${BREAKCRYPT_SRCS})
+target_link_libraries(rsabreakcrypt ${GMPXX_LIBRARIES})
