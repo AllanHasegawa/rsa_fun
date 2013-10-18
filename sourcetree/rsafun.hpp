@@ -59,6 +59,9 @@ namespace rf {
 				const RSAPublicKey& public_key,
 				const int threads,
 				mpz_class& result);
+
+	RSAPrivateKey break_crypt(const RSAPublicKey& public_key,
+			const int threads);
 } // end namespace rf
 
 #endif //RF_RSAFUN_HPP

@@ -114,3 +114,29 @@ void rf::decrypt_with_public_key(const mpz_class& C,
 	rf::decrypt(C, private_key, result);
 }
 
+rf::RSAPrivateKey rf::break_crypt(const RSAPublicKey& public_key,
+		const int threads)
+{
+	mpz_class p;
+	mpz_class q;
+	find_2_prime_factors_blocks(public_key.n, threads, p, q);
+
+	mpz_class pq{(p-1)*(q-1)};
+
+	// ed = 1 + pq(a)
+	// e is know, also "pq".
+	// Use extended euclidean to find d and a;
+	auto ee = rf::extended_euclidean(pq,public_key.e);
+	mpz_class d{std::get<2>(ee)};
+	// get the next positive value of "d"
+	// not equal to "e"
+	while (d <= 0 || d == public_key.e) {
+		d += pq;
+	}
+
+	RSAPrivateKey private_key;
+	private_key.n = public_key.n;
+	private_key.d = d;
+
+	return private_key;
+}
