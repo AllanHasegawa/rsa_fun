@@ -4,6 +4,7 @@
 #include <utility>
 #include <tuple>
 #include <cmath>
+#include "cereal/types/string.hpp"
 #include "gmp.h"
 #include "gmpxx.h"
 #include "rfmath.hpp"
@@ -18,12 +19,26 @@ namespace rf {
 	struct RSAKey<RSAKeyType::PRIVATE> {
 		mpz_class d;
 		mpz_class n;
+
+		template<typename Archive>
+		void serialize(Archive& archive)
+		{
+			archive(std::string(d.get_str(16)),
+					std::string(n.get_str(16)));
+		}
 	};
 
 	template<>
 	struct RSAKey<RSAKeyType::PUBLIC> {
 		mpz_class e;
 		mpz_class n;
+
+		template<typename Archive>
+		void serialize(Archive& archive)
+		{
+			archive(std::string(e.get_str(16)),
+					std::string(n.get_str(16)));
+		}
 	};
 
 	using RSAPrivateKey = RSAKey<RSAKeyType::PRIVATE>;
