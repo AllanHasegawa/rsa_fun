@@ -1,9 +1,7 @@
-#include <iostream>
-#include <fstream>
 #include <string>
-#include "cereal/archives/binary.hpp"
+#include <exception>
 #include "rsafun.hpp"
-
+#include "rfutils.hpp"
 
 int main(int argc, char* argv[]) {
 	using namespace std;
@@ -15,9 +13,6 @@ int main(int argc, char* argv[]) {
 		cout << usage << endl;
 		return 0;
 	}
-
-	using PB = rf::PrimeBuffer<mpz_class>;
-	PB{100};
 
 	string filename = argv[1];
 	string precision_str = argv[2]; 
@@ -36,17 +31,8 @@ int main(int argc, char* argv[]) {
 		cout << "Error: Wrong number entered..." << endl;
 		return 0;
 	}
-	{
-		ofstream ofs_pub(filename + ".pub");
-		ofstream ofs_priv(filename + ".priv");
-
-		cereal::BinaryOutputArchive boa_pub(ofs_pub);
-		cereal::BinaryOutputArchive boa_priv(ofs_priv);
-
-		auto keys = rf::gen_key_pairs(precision_bits, passes, threads);
-		boa_priv(keys.first);
-		boa_pub(keys.second);
-	}
+	auto keys = rf::gen_key_pairs(precision_bits, passes, threads);
+	rf::save_keys(keys, filename);
 
 	return 0;
 }
