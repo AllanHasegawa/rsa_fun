@@ -48,11 +48,13 @@ void rf::random_coprime(const mpz_class& n, const int precision_bits,
 			const int threads, mpz_class& coprime)
 {
 	if (precision_bits < 2)
-		throw std::invalid_argument("Precision bits must be >=2");
+		throw std::invalid_argument("random_coprime:"
+				" Precision bits must be >=2");
 	if (n < 2)
-		throw std::invalid_argument("n must be >=2");
+		throw std::invalid_argument("random_coprime: n must be >=2");
 	if (threads < 1)
-		throw std::invalid_argument("threads must be >=1");
+		throw std::invalid_argument("random_coprime: "
+				"threads must be >=1");
 
 	using namespace std;
 	atomic_bool found_coprime;
@@ -109,6 +111,7 @@ void rf::random_prime(const int precision_bits, const int fermat_passes,
 	auto primep = prime.get_mpz_t();
 	while(true) {
 		mpz_urandomb(primep, rs, precision_bits); 
+		if (prime < 2) continue;
 		if (mpz_even_p(primep)) prime += 1;
 		if (is_prime_fermat(prime,
 			fermat_passes, threads)) break;
