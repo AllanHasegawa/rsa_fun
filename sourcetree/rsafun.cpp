@@ -11,6 +11,7 @@
 rf::RSAKeyPair rf::gen_key_pairs(const int precision_bits,
 				const int fermat_passes, const int threads)
 {
+	using namespace std;
 	RSAPrivateKey private_key;
 	RSAPublicKey public_key;
 	
@@ -18,22 +19,36 @@ rf::RSAKeyPair rf::gen_key_pairs(const int precision_bits,
 	mpz_class q;
 	rf::random_prime(precision_bits, fermat_passes, threads, p);
 	rf::random_prime(precision_bits, fermat_passes, threads, q);
+	while (p == q) {
+		rf::random_prime(precision_bits, fermat_passes, threads, q);
+	}
 
 	mpz_class pq{(p-1)*(q-1)};
 	mpz_class n{p*q};
+	auto np = n.get_mpz_t();
 
+	// gcd(e,pq) == 1
+	mpz_class e;
+	auto ep = e.get_mpz_t();
+	mpz_class t;
+	auto tp = t.get_mpz_t();
+	while (true) {
+		rf::random_coprime(pq, precision_bits, threads, e);
+		t = 42;
+		mpz_powm(tp, tp, ep, np);
+		if (e == p || e == q || e == n || t == 42) continue;
+		else break;
+	}
 
-	// ed = 1 + pq(a)
-	mpz_class e;	
-	rf::random_coprime(pq, precision_bits, threads, e);
 
 	// ed = 1 + pq(a)
 	// e is know, also "pq".
 	// Use extended euclidean to find d and a;
-	const auto ee = rf::extended_euclidean(pq,public_key.e);
+	auto ee = rf::extended_euclidean(pq,e);
 	mpz_class d{std::get<2>(ee)};
 	// get the next positive value of "d"
-	while (d <= 0) {
+	// not equal to "e"
+	while (d <= 0 || d == e) {
 		d += pq;
 	}
 
