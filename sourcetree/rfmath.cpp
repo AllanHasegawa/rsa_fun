@@ -95,6 +95,8 @@ void rf::random_coprime(const mpz_class& n, const int precision_bits,
 			gmp_randclear(rs);
 		}));
 	}
+	for (auto i = jobs.begin(); i != jobs.end(); ++i)
+		i->wait();
 
 }
 
