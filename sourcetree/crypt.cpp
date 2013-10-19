@@ -29,13 +29,39 @@ int main(int argc, char* argv[]) {
 	auto message = rf::file_to_bytes(messagefile);
 	vector<string> crypt_message;
 
+	auto np = public_key.n.get_mpz_t();
+	// size in bits of the public key
+	// (determines max size of the block!)
+	auto n_size = mpz_sizeinbase(np,2);
+	// 2 bits bc the function may return +/- 2 bits
+	int max_block_size = (n_size-2)/8;
+
 	mpz_class r;
-	for_each (message.begin(), message.end(),[&](uint8_t m) {
-		mpz_class M{m};
-		rf::crypt(M, public_key, r);
+	mpz_class block = 0;
+	auto blockp = block.get_mpz_t();
+	mpz_class m;
+	auto mp = m.get_mpz_t();
+	int c{};
+	for_each (message.begin(), message.end(),[&](uint8_t b) {
+		m = b;
+		mpz_mul_2exp(mp, mp, c*8);	
+		block = block + m;
+		++c;
+		if (c == max_block_size) {
+			rf::crypt(block, public_key, r);
+			string t(r.get_str(16));
+			crypt_message.push_back(t);
+			c = 0;
+			block = 0;
+		}
+	});
+
+	if (c > 0) {
+		mpz_mul_2exp(blockp, blockp, (max_block_size-c)*8);
+		rf::crypt(block, public_key, r);
 		string t(r.get_str(16));
 		crypt_message.push_back(t);
-	});
+	}
 
 
 	ofstream ofs(cryptfile);
