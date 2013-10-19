@@ -369,6 +369,8 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 		const auto n109p = n109.get_mpz_t();
 		const mpz_class n113{113};
 		const auto n113p = n113.get_mpz_t();
+		const mpz_class n121{121};
+		const auto n121p = n121.get_mpz_t();
 		const mpz_class n127{127};
 		const auto n127p = n127.get_mpz_t();
 		const mpz_class n131{131};
@@ -377,6 +379,8 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 		const auto n137p = n137.get_mpz_t();
 		const mpz_class n139{139};
 		const auto n139p = n139.get_mpz_t();
+		const mpz_class n143{143};
+		const auto n143p = n143.get_mpz_t();
 		const mpz_class n149{149};
 		const auto n149p = n149.get_mpz_t();
 		const mpz_class n151{151};
@@ -387,12 +391,16 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 		const auto n163p = n163.get_mpz_t();
 		const mpz_class n167{167};
 		const auto n167p = n167.get_mpz_t();
+		const mpz_class n169{169};
+		const auto n169p = n169.get_mpz_t();
 		const mpz_class n173{173};
 		const auto n173p = n173.get_mpz_t();
 		const mpz_class n179{179};
 		const auto n179p = n179.get_mpz_t();
 		const mpz_class n181{181};
 		const auto n181p = n181.get_mpz_t();
+		const mpz_class n187{187};
+		const auto n187p = n187.get_mpz_t();
 		const mpz_class n191{191};
 		const auto n191p = n191.get_mpz_t();
 		const mpz_class n193{193};
@@ -470,6 +478,8 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n113p);
 			if (mpz_divisible_p(np, tp)) break;
+			mpz_add(tp, ip, n121p);
+			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n127p);
 			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n131p);
@@ -477,6 +487,8 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 			mpz_add(tp, ip, n137p);
 			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n139p);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add(tp, ip, n143p);
 			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n149p);
 			if (mpz_divisible_p(np, tp)) break;
@@ -488,11 +500,15 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n167p);
 			if (mpz_divisible_p(np, tp)) break;
+			mpz_add(tp, ip, n169p);
+			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n173p);
 			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n179p);
 			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n181p);
+			if (mpz_divisible_p(np, tp)) break;
+			mpz_add(tp, ip, n187p);
 			if (mpz_divisible_p(np, tp)) break;
 			mpz_add(tp, ip, n191p);
 			if (mpz_divisible_p(np, tp)) break;
@@ -514,6 +530,12 @@ void rf::find_2_prime_factors_blocks(const mpz_class& n, const int threads,
 
 	for (auto i = jobs.begin(); i != jobs.end(); ++i)
 		i->wait();
+
+	if (x*y != n)
+		throw std::runtime_error("Failed to find_2_prime_factors:\n"
+				+ x.get_str(10) + "\n"
+				+ y.get_str(10) + "\n"
+				+ n.get_str(10));
 
 }
 
