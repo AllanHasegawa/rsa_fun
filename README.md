@@ -4,7 +4,7 @@ rsa_fun is an educational project developed to investigate and study the RSA alg
 of the RSA algorithm described in ("Algorithms", Dasgupta; Papadimitriou;
 Vazirani, 2006). The project creates the following programs:
 
-  * Key pair generator (with any number os bits)
+  * Key pair generator (with any number of bits)
   * cipher (uses public key)
   * decipher (uses private key)
   * decipher (uses public key - factor integer number with brute force)
