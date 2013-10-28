@@ -1,8 +1,13 @@
 # rsa_fun
 
-rsa_fun is an educational project developed. It's an implementation
+rsa_fun is an educational project developed to investigate and study the RSA algorithm. It's an implementation
 of the RSA algorithm described in ("Algorithms", Dasgupta; Papadimitriou;
-Vazirani, 2006).
+Vazirani, 2006). The project creates the following programs:
+
+  * Key pair generator (with any number os bits)
+  * cipher (uses public key)
+  * decipher (uses private key)
+  * decipher (uses public key - factor integer number with brute force)
 
 
 It is *NOT* an optimal solution. High performance functions already implemented
